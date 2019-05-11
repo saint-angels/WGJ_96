@@ -4,25 +4,29 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private PlayerGun gunPrefab;
+    [SerializeField] private PlayerGun gunPrefab = null;
 
-    // Start is called before the first frame update
+    private PlayerGun gun;
+    
     void Start()
     {
-        GridManager.Instance.SpawnObject(gunPrefab, Vector2Int.zero);
+        gun = GridManager.Instance.SpawnObject(gunPrefab, Vector2Int.zero) as PlayerGun;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.UpArrow)) Move(Vector2.up);
-        else if (Input.GetKeyDown(KeyCode.DownArrow)) Move(Vector2.down);
-        else if (Input.GetKeyDown(KeyCode.LeftArrow)) Move(Vector2.left);
-        else if (Input.GetKeyDown(KeyCode.RightArrow)) Move(Vector2.right);
+        if (Input.GetKeyDown(KeyCode.UpArrow)) Move(Vector2Int.up);
+        else if (Input.GetKeyDown(KeyCode.DownArrow)) Move(Vector2Int.down);
+        else if (Input.GetKeyDown(KeyCode.LeftArrow)) Move(Vector2Int.left);
+        else if (Input.GetKeyDown(KeyCode.RightArrow)) Move(Vector2Int.right);
     }
 
-    private void Move(Vector2 direction)
+    private void Move(Vector2Int direction)
     {
-
+        if (GridManager.Instance.IsFree(gun.Position + direction, gun.size))
+        {
+            GridManager.Instance.MoveObject(gun, gun.Position + direction);
+        }
     }
 }

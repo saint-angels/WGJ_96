@@ -6,23 +6,27 @@ public class PieceSpawner : MonoBehaviour
 {
     [SerializeField] private Piece[] availablePieces = null;
 
-    [SerializeField] private int spawnDelay = 2;
+    [SerializeField] private int spawnCooldownTicks = 3;
 
-    IEnumerator SpawnRoutine()
+    private int currentSpawnCooldown = 0;
+
+    private void Start()
     {
-        while (true)
+        GridManager.Instance.OnGridTick += Instance_OnGridTick;
+    }
+
+    private void Instance_OnGridTick()
+    {
+        if (currentSpawnCooldown == 0)
         {
             Piece selectedPiecePrefab = availablePieces[Random.Range(0, availablePieces.Length)];
             int spawnHeight = GridManager.height - selectedPiecePrefab.size.y;
             GridManager.Instance.SpawnObject(selectedPiecePrefab, new Vector2Int(0, spawnHeight));
-            yield return new WaitForSeconds(spawnDelay);
-
-            
+            currentSpawnCooldown = spawnCooldownTicks;
         }
-    }
-
-    private void Start()
-    {
-        StartCoroutine(SpawnRoutine());
+        else
+        {
+            currentSpawnCooldown -= 1;
+        }
     }
 }
