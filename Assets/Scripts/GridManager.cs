@@ -14,6 +14,24 @@ public class GridManager : SingletonComponent<GridManager>
     private GridObjectBase[,] grid = new GridObjectBase[width, height];
     private List<Piece> activePieces = new List<Piece>();
 
+
+    public GridObjectBase GetFirstObjectInLine(Vector2Int startOrigin, Vector2Int rect)
+    {
+        GridObjectBase foundObject = null;
+
+        ForGridRectDo(startOrigin, rect, (x, y) =>
+        {
+            if (grid[x,y] != null && foundObject == null)
+            {
+                foundObject = grid[x, y];
+            }
+
+        });
+
+        return foundObject;
+    }
+
+
     public GridObjectBase SpawnObject(GridObjectBase newObjectPrefab, Vector2Int position)
     {
         bool canSpawn = IsFree(position, newObjectPrefab.size);
@@ -27,7 +45,7 @@ public class GridManager : SingletonComponent<GridManager>
                 activePieces.Add((Piece)newObject);
             }
 
-            ForRectDo(position, newObject.size, (x,y) =>
+            ForGridRectDo(position, newObject.size, (x,y) =>
             {
                 grid[x, y] = newObject;
             });
@@ -38,8 +56,6 @@ public class GridManager : SingletonComponent<GridManager>
             return null;
         }
     }
-
-
 
     public bool IsFree(Vector2Int position, Vector2Int size)
     {
@@ -54,7 +70,7 @@ public class GridManager : SingletonComponent<GridManager>
             return false;
         }
 
-        ForRectDo(position, size, (x, y) =>
+        ForGridRectDo(position, size, (x, y) =>
         {
             if (grid[x, y] != null)
             {
@@ -67,7 +83,7 @@ public class GridManager : SingletonComponent<GridManager>
     public void MoveObject(GridObjectBase movedObject, Vector2Int newPosition)
     {
         //Remove piece from prev location
-        ForRectDo(movedObject.Position, movedObject.size, (x, y) =>
+        ForGridRectDo(movedObject.Position, movedObject.size, (x, y) =>
         {
             if (grid[x, y] == movedObject)
             {
@@ -77,13 +93,33 @@ public class GridManager : SingletonComponent<GridManager>
 
         //Move piece to new position
         movedObject.UpdatePosition(newPosition);
-        ForRectDo(movedObject.Position, movedObject.size, (x, y) =>
+        ForGridRectDo(movedObject.Position, movedObject.size, (x, y) =>
         {
             grid[x, y] = movedObject;
         });
     }
 
-    private void ForRectDo(Vector2Int position, Vector2Int size, Action<int,int> action)
+    public void DestroyPiece(Piece piece)
+    {
+        ForGridObjectRectDo(piece, (x, y) =>
+        {
+            if (grid[x, y] == piece)
+            {
+                grid[x, y] = null;
+            }
+            
+        });
+        activePieces.Remove(piece);
+
+        Destroy(piece.gameObject);
+    }
+
+    private void ForGridObjectRectDo(GridObjectBase gridObject, Action<int, int> action)
+    {
+        ForGridRectDo(gridObject.Position, gridObject.size, action);
+    }
+
+    private void ForGridRectDo(Vector2Int position, Vector2Int size, Action<int,int> action)
     {
         for (int i = position.x; i < position.x + size.x; i++)
         {
@@ -106,14 +142,17 @@ public class GridManager : SingletonComponent<GridManager>
 
     private void UpdateGravity()
     {
+        List<Piece> piecesToDestroy = new List<Piece>();
+
         foreach (var piece in activePieces)
         {
             bool pieceFalling = true;
+            bool pieceOnTheFloor = false;
             Vector2Int pieceFeetRect = new Vector2Int(piece.size.x, 1);
-            ForRectDo(piece.Position, pieceFeetRect, (x, y) =>
+            ForGridRectDo(piece.Position, pieceFeetRect, (x, y) =>
             {
                 bool pieceHasPartAtPoint = grid[x, y] == piece;
-                bool pieceOnTheFloor = pieceHasPartAtPoint && y == 0;
+                pieceOnTheFloor = pieceHasPartAtPoint && y == 0;
                 bool pieceOnOther = pieceHasPartAtPoint && y > 0 && grid[x, y - 1] != null;
                 if (pieceOnTheFloor || pieceOnOther)
                 {
@@ -125,6 +164,16 @@ public class GridManager : SingletonComponent<GridManager>
             {
                 MoveObject(piece, piece.Position - Vector2Int.up);
             }
+            else if(pieceOnTheFloor)
+            {
+                piecesToDestroy.Add(piece);
+            }
+        }
+
+        //Destroy pieces on the floor
+        for (int i = piecesToDestroy.Count - 1; i >= 0; i--)
+        {
+            DestroyPiece(piecesToDestroy[i]);
         }
     }
 

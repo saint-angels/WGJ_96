@@ -233,6 +233,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1e94b27bf2f9cd458227e3b8d2281a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tickDuration: 0.3
 --- !u!4 &1693959943
 Transform:
   m_ObjectHideFlags: 0
@@ -261,7 +262,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   availablePieces:
   - {fileID: 5521880479763452694, guid: fc8d698ad3702324ab60da118e9d2bf3, type: 3}
-  spawnDelay: 2
+  spawnCooldownTicks: 3
 --- !u!1 &1767259582
 GameObject:
   m_ObjectHideFlags: 0
