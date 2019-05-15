@@ -45,6 +45,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: {x: 1, y: 1}
+  shotPush: 2
+  fireArea: {x: 1, y: 3}
+  shotStun: 10
 --- !u!1 &831725527772950283
 GameObject:
   m_ObjectHideFlags: 0

@@ -25,7 +25,6 @@ public class GridManager : SingletonComponent<GridManager>
             {
                 foundObject = grid[x, y];
             }
-
         });
 
         return foundObject;
@@ -78,6 +77,25 @@ public class GridManager : SingletonComponent<GridManager>
             }
         });
         return isFree;
+    }
+
+    public void MoveObjectYMax(GridObjectBase movedObject, Vector2Int maxPosition)
+    {
+        int objectX = movedObject.Position.x;
+
+        for (int y = movedObject.Position.y + 1; y <= maxPosition.y; y++)
+        {
+            Vector2Int newPosition = new Vector2Int(objectX, y);
+            bool freeSpot = IsFree(newPosition, movedObject.size);
+            if (freeSpot)
+            {
+                MoveObject(movedObject, newPosition);
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 
     public void MoveObject(GridObjectBase movedObject, Vector2Int newPosition)
@@ -146,6 +164,12 @@ public class GridManager : SingletonComponent<GridManager>
 
         foreach (var piece in activePieces)
         {
+            if (piece.stunLeft > 0)
+            {
+                piece.stunLeft--;
+                continue;
+            }
+
             bool pieceFalling = true;
             bool pieceOnTheFloor = false;
             Vector2Int pieceFeetRect = new Vector2Int(piece.size.x, 1);
