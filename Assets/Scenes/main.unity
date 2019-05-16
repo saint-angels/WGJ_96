@@ -836,9 +836,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e9b42d22df8e67409dbd35eff0e7c11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pieceColors:
-  - {r: 0.9433962, g: 0.24474904, b: 0.24474904, a: 1}
-  - {r: 0.11792451, g: 0.6708021, b: 1, a: 1}
+  pieceColorsNormal: {r: 1, g: 0.41037738, b: 0.41037738, a: 1}
+  pieceColorsLinked: {r: 1, g: 0, b: 0, a: 1}
   availablePieces:
   - {fileID: 5521880479763452694, guid: fc8d698ad3702324ab60da118e9d2bf3, type: 3}
   - {fileID: 5521880479763452694, guid: 069a05dc87eb9ea4aaa3c204f33d9681, type: 3}
