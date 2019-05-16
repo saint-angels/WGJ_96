@@ -14,6 +14,30 @@ public class GameController : SingletonComponent<GameController>
 
 
     [SerializeField] private GameObject deathPanel;
+    [SerializeField] private TMPro.TextMeshProUGUI scoreText;
+
+    private int Score
+    {
+        set
+        {
+            score = value;
+            scoreText.text = score.ToString("0000");
+        }
+        get
+        {
+            return score;
+        }
+    }
+
+    int score = 0;
+
+
+
+    public void AddScore(int blocksDestroyed)
+    {
+        Score += blocksDestroyed;
+    }
+
 
     public void SetState(GameState newState)
     {
@@ -24,6 +48,7 @@ public class GameController : SingletonComponent<GameController>
             case GameState.PLAYING:
                 GridManager.Instance.Init();
                 deathPanel.SetActive(false);
+                Score = 0;
                 break;
             case GameState.PLAYER_DEAD:
                 print("player gun died");

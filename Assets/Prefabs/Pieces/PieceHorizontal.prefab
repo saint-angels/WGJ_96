@@ -126,6 +126,7 @@ MonoBehaviour:
   size: {x: 3, y: 1}
   health: 3
   stunLeft: 0
+  visualsContainer: {fileID: 3801981394718278146}
 --- !u!1 &6709817157777090386
 GameObject:
   m_ObjectHideFlags: 0

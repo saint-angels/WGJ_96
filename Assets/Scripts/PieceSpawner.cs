@@ -22,8 +22,9 @@ public class PieceSpawner : MonoBehaviour
         {
             Piece selectedPiecePrefab = availablePieces[Random.Range(0, availablePieces.Length)];
             int spawnHeight = GridManager.height - selectedPiecePrefab.size.y;
+            int randomX = Random.Range(0, GridManager.width - selectedPiecePrefab.size.x + 1);
             Color pieceColor = pieceColors[Random.Range(0, pieceColors.Length)];
-            GridManager.Instance.SpawnObject(selectedPiecePrefab, new Vector2Int(0, spawnHeight), pieceColor);
+            GridManager.Instance.SpawnObject(selectedPiecePrefab, new Vector2Int(randomX, spawnHeight), pieceColor);
             currentSpawnCooldown = spawnCooldownTicks;
         }
         else

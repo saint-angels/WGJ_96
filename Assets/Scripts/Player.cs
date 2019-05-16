@@ -15,11 +15,11 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.UpArrow)) Move(Vector2Int.up);
-        else if (Input.GetKeyDown(KeyCode.DownArrow)) Move(Vector2Int.down);
-        else if (Input.GetKeyDown(KeyCode.LeftArrow)) Move(Vector2Int.left);
+        //if (Input.GetKeyDown(KeyCode.UpArrow)) Move(Vector2Int.up);
+        //else if (Input.GetKeyDown(KeyCode.DownArrow)) Move(Vector2Int.down);
+        if (Input.GetKeyDown(KeyCode.LeftArrow)) Move(Vector2Int.left);
         else if (Input.GetKeyDown(KeyCode.RightArrow)) Move(Vector2Int.right);
-        else if (Input.GetKeyDown(KeyCode.Space)) gun.Shoot();
+        else if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl)) gun.Shoot();
     }
 
     private void Move(Vector2Int direction)

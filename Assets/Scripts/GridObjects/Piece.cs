@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using DG.Tweening;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,7 @@ public class Piece : GridObjectBase
 {
     public int health = 3;
     public int stunLeft = 0;
+    public Transform visualsContainer;
 
     public void Init(Color color)
     {
@@ -13,11 +15,13 @@ public class Piece : GridObjectBase
         {
             rendw.color = color;
         }
-        
     }
 
     public void Damage(int damage, int shotPushHeigh, int stun)
     {
+        visualsContainer.DOKill();
+        visualsContainer.DOShakePosition(.1f, Random.insideUnitSphere);
+
         stunLeft = stun;
         health -= damage;
 
@@ -27,6 +31,7 @@ public class Piece : GridObjectBase
 
         if (health <= 0)
         {
+            GameController.Instance.AddScore(10);
             GridManager.Instance.DestroyPiece(this);
         }
     }
