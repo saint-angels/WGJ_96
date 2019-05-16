@@ -10,10 +10,9 @@ public class Player : MonoBehaviour
     
     void Start()
     {
-        gun = GridManager.Instance.SpawnObject(gunPrefab, Vector2Int.zero) as PlayerGun;
+        gun = GridManager.Instance.SpawnObject(gunPrefab, Vector2Int.zero, Color.white) as PlayerGun;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.UpArrow)) Move(Vector2Int.up);

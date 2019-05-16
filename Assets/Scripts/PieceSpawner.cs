@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PieceSpawner : MonoBehaviour
 {
+    [SerializeField] private Color[] pieceColors;
     [SerializeField] private Piece[] availablePieces = null;
 
     [SerializeField] private int spawnCooldownTicks = 3;
@@ -21,7 +22,8 @@ public class PieceSpawner : MonoBehaviour
         {
             Piece selectedPiecePrefab = availablePieces[Random.Range(0, availablePieces.Length)];
             int spawnHeight = GridManager.height - selectedPiecePrefab.size.y;
-            GridManager.Instance.SpawnObject(selectedPiecePrefab, new Vector2Int(0, spawnHeight));
+            Color pieceColor = pieceColors[Random.Range(0, pieceColors.Length)];
+            GridManager.Instance.SpawnObject(selectedPiecePrefab, new Vector2Int(0, spawnHeight), pieceColor);
             currentSpawnCooldown = spawnCooldownTicks;
         }
         else

@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerGun : GridObjectBase
 {
 
-    public int shotPush = 2;
+    public int shotPushHeight = 2;
     public Vector2Int fireArea = new Vector2Int(1, 3);
     public int shotStun = 3;
 
@@ -15,7 +15,7 @@ public class PlayerGun : GridObjectBase
         Piece foundPiece = GridManager.Instance.GetFirstObjectInLine(shootOrigin, fireArea) as Piece;
         if (foundPiece != null)
         {
-            foundPiece.Damage(1, shotPush, shotStun);
+            foundPiece.Damage(1, shotPushHeight, shotStun);
             print($"damaging piece {foundPiece.gameObject.name}");
         }
     }

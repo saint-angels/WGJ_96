@@ -5,15 +5,28 @@ using UnityEngine;
 
 public class GridManager : SingletonComponent<GridManager>
 {
+    public event Action OnPlayerDeath = () => { };
     public event Action OnGridTick = () => { };
 
-    public const int width = 10;
+    [SerializeField] private GameObject gridBlockBackgroundPrefab;
+
+    public const int width = 7;
     public const int height = 10;
     public float tickDuration = 1f;
 
     private GridObjectBase[,] grid = new GridObjectBase[width, height];
     private List<Piece> activePieces = new List<Piece>();
 
+
+    public void Init()
+    {
+        for (int i = activePieces.Count - 1; i >= 0; i--)
+        {
+            DestroyPiece(activePieces[i]);
+        }
+
+        StartCoroutine(GridTickRoutine());
+    }
 
     public GridObjectBase GetFirstObjectInLine(Vector2Int startOrigin, Vector2Int rect)
     {
@@ -31,7 +44,7 @@ public class GridManager : SingletonComponent<GridManager>
     }
 
 
-    public GridObjectBase SpawnObject(GridObjectBase newObjectPrefab, Vector2Int position)
+    public GridObjectBase SpawnObject(GridObjectBase newObjectPrefab, Vector2Int position, Color color)
     {
         bool canSpawn = IsFree(position, newObjectPrefab.size);
 
@@ -41,6 +54,7 @@ public class GridManager : SingletonComponent<GridManager>
             newObject.UpdatePosition(position);
             if (newObject is Piece)
             {
+                (newObject as Piece).Init(color);
                 activePieces.Add((Piece)newObject);
             }
 
@@ -172,19 +186,29 @@ public class GridManager : SingletonComponent<GridManager>
 
             bool pieceFalling = true;
             bool pieceOnTheFloor = false;
+            bool playerSmashed = false;
             Vector2Int pieceFeetRect = new Vector2Int(piece.size.x, 1);
             ForGridRectDo(piece.Position, pieceFeetRect, (x, y) =>
             {
                 bool pieceHasPartAtPoint = grid[x, y] == piece;
                 pieceOnTheFloor = pieceHasPartAtPoint && y == 0;
                 bool pieceOnOther = pieceHasPartAtPoint && y > 0 && grid[x, y - 1] != null;
-                if (pieceOnTheFloor || pieceOnOther)
+                if (pieceOnTheFloor == false && grid[x, y - 1] is PlayerGun)
+                {
+                    playerSmashed = true;
+                }
+                else if (pieceOnTheFloor || pieceOnOther)
                 {
                     pieceFalling = false;
                 }
             });
 
-            if (pieceFalling)
+            if (playerSmashed)
+            {
+                OnPlayerDeath();
+                return;
+            }
+            else if (pieceFalling)
             {
                 MoveObject(piece, piece.Position - Vector2Int.up);
             }
@@ -203,7 +227,14 @@ public class GridManager : SingletonComponent<GridManager>
 
     void Start()
     {
-        StartCoroutine(GridTickRoutine());
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                var newGridBlock = Instantiate(gridBlockBackgroundPrefab, transform);
+                newGridBlock.transform.position = new Vector3(x, y, 0);
+            }
+        }
     }
 
     void Update()
