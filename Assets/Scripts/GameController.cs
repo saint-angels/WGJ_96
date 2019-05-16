@@ -72,7 +72,7 @@ public class GameController : SingletonComponent<GameController>
             case GameState.PLAYING:
                 break;
             case GameState.PLAYER_DEAD:
-                if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+                if (Input.GetKeyDown(KeyCode.Space))
                 {
                     SetState(GameState.PLAYING);
                 }

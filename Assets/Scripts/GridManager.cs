@@ -44,7 +44,7 @@ public class GridManager : SingletonComponent<GridManager>
     }
 
 
-    public GridObjectBase SpawnObject(GridObjectBase newObjectPrefab, Vector2Int position, Color color)
+    public GridObjectBase SpawnObject(GridObjectBase newObjectPrefab, Vector2Int position, Color colorNormal, Color colorLinked)
     {
         bool canSpawn = IsFree(position, newObjectPrefab.size);
 
@@ -54,7 +54,7 @@ public class GridManager : SingletonComponent<GridManager>
             newObject.UpdatePosition(position);
             if (newObject is Piece)
             {
-                (newObject as Piece).Init(color);
+                (newObject as Piece).Init(colorNormal, colorLinked);
                 activePieces.Add((Piece)newObject);
             }
 
@@ -131,6 +131,14 @@ public class GridManager : SingletonComponent<GridManager>
         });
     }
 
+    public void DestroyPieces(List<Piece> pieces)
+    {
+        for (int i = pieces.Count - 1; i >= 0; i--)
+        {
+            DestroyPiece(pieces[i]);
+        }
+    }
+
     public void DestroyPiece(Piece piece)
     {
         ForGridObjectRectDo(piece, (x, y) =>
@@ -157,7 +165,10 @@ public class GridManager : SingletonComponent<GridManager>
         {
             for (int j = position.y; j < position.y + size.y; j++)
             {
-                action(i, j);
+                if (i >= 0 && j >= 0 && i < width && j < height)
+                {
+                    action(i, j);
+                }
             }
         }
     }
@@ -178,6 +189,8 @@ public class GridManager : SingletonComponent<GridManager>
 
         foreach (var piece in activePieces)
         {
+            piece.ClearLinkedPieces();
+
             if (piece.stunLeft > 0)
             {
                 piece.stunLeft--;
@@ -201,6 +214,16 @@ public class GridManager : SingletonComponent<GridManager>
                 {
                     pieceFalling = false;
                 }
+
+                if (pieceOnOther)
+                {
+                    var bottomPiece = grid[x, y - 1] as Piece;
+                    if (bottomPiece != null)
+                    {
+                        bottomPiece.SmashedByOtherPiece();
+                    }
+                }
+                
             });
 
             if (playerSmashed)
@@ -212,11 +235,23 @@ public class GridManager : SingletonComponent<GridManager>
             {
                 MoveObject(piece, piece.Position - Vector2Int.up);
             }
-            else if(pieceOnTheFloor)
+            else if (pieceOnTheFloor)
             {
                 piecesToDestroy.Add(piece);
             }
         }
+
+        foreach (var piece in activePieces)
+            ForGridRectDo(piece.Position - Vector2Int.one, piece.size + Vector2Int.one * 2, (x, y) =>
+            {
+                Piece anotherPiece = grid[x, y] as Piece;
+                if (anotherPiece != null && anotherPiece != piece && piece.linkedPieces.Contains(anotherPiece) == false)
+                {
+                    piece.LinkPiece(anotherPiece);
+                }
+
+            });
+        { }
 
         //Destroy pieces on the floor
         for (int i = piecesToDestroy.Count - 1; i >= 0; i--)
